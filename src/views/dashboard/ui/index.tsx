@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { ErrorBoundary } from "@suspensive/react";
 import { SuspenseQuery } from "@suspensive/react-query";
+import { useAuth } from "@/src/entities/authorization";
 import { UserTable } from "./user-table";
 import { TransactionTable } from "./transaction-table";
 import { fetchDashboardUsers } from "../api/fetch-dashboard-users";
@@ -14,6 +15,7 @@ import { DashboardErrorFallback } from "./page-error-fallback";
 import { DashboardLoadingFallback } from "./page-loading-fallback";
 
 export const DashboardPage = () => {
+  const { isAuthenticated } = useAuth();
   const page = 1;
   const limit = 10;
 
@@ -46,28 +48,33 @@ export const DashboardPage = () => {
           </div>
 
           {/* 거래 내역 Section */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                거래 내역
-              </h2>
-            </div>
+          {isAuthenticated && (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  거래 내역
+                </h2>
+              </div>
 
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
-              <ErrorBoundary fallback={<DashboardErrorFallback />}>
-                <Suspense fallback={<DashboardLoadingFallback />}>
-                  <SuspenseQuery
-                    queryKey={dashboardQueryKeys.transactionsList(page, limit)}
-                    queryFn={() => fetchDashboardTransactions(page, limit)}
-                  >
-                    {({ data }: { data: TransactionApiResponse }) => (
-                      <TransactionTable transactions={data.transactions} />
-                    )}
-                  </SuspenseQuery>
-                </Suspense>
-              </ErrorBoundary>
+              <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+                <ErrorBoundary fallback={<DashboardErrorFallback />}>
+                  <Suspense fallback={<DashboardLoadingFallback />}>
+                    <SuspenseQuery
+                      queryKey={dashboardQueryKeys.transactionsList(
+                        page,
+                        limit
+                      )}
+                      queryFn={() => fetchDashboardTransactions(page, limit)}
+                    >
+                      {({ data }: { data: TransactionApiResponse }) => (
+                        <TransactionTable transactions={data.transactions} />
+                      )}
+                    </SuspenseQuery>
+                  </Suspense>
+                </ErrorBoundary>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

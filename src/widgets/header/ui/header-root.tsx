@@ -1,7 +1,12 @@
+"use client";
+
 import { Avatar } from "@heroui/avatar";
 import { Link } from "@heroui/link";
+import { useAuth } from "@/src/entities/authorization";
 
 export const Header = () => {
+  const { isAuthenticated, user } = useAuth();
+
   return (
     <header className="w-full px-6 py-4 bg-white shadow-sm border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800">
       <div className="flex justify-between items-center max-w-7xl mx-auto">
@@ -27,7 +32,18 @@ export const Header = () => {
             </Link>
           </nav>
         </div>
-        <Avatar size="md" radius="full" name="Kim" />
+
+        <div className="flex items-center space-x-4">
+          {isAuthenticated && user && (
+            <Avatar
+              size="md"
+              radius="full"
+              name={user.name}
+              src={user.avatar}
+              showFallback
+            />
+          )}
+        </div>
       </div>
     </header>
   );
